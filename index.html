@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crypto Mining & Trading Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #181c23; color: #eee; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: #23272f; padding: 20px; border-radius: 10px; }
+        button { background: #2ecc71; color: #fff; border: none; padding: 10px 20px; margin: 5px 0; border-radius: 5px; cursor: pointer; }
+        button:disabled { background: #888; }
+        input[type="number"] { width: 80px; }
+        .stats { margin-bottom: 20px; }
+        .stats div { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crypto Mining & Trading Game</h2>
+        <div class="stats">
+            <div>💰 Cash: $<span id="cash">1000</span></div>
+            <div>⛏️ Crypto: <span id="crypto">0</span> coins</div>
+            <div>💹 Price: $<span id="price">100</span> per coin</div>
+            <div>⚡ Mining Power: <span id="power">1</span> coins/sec</div>
+        </div>
+        <button id="mineBtn">Mine Crypto</button>
+        <button id="upgradeBtn">Upgrade Miner ($500)</button>
+        <hr>
+        <div>
+            <input type="number" id="buyAmount" min="1" value="1">
+            <button id="buyBtn">Buy Crypto</button>
+        </div>
+        <div>
+            <input type="number" id="sellAmount" min="1" value="1">
+            <button id="sellBtn">Sell Crypto</button>
+        </div>
+        <hr>
+        <div id="message"></div>
+    </div>
+    <script>
+        let cash = 1000;
+        let crypto = 0;
+        let price = 100;
+        let miningPower = 1;
+        let upgradeCost = 500;
+
+        function updateUI() {
+            document.getElementById('cash').textContent = cash.toFixed(2);
+            document.getElementById('crypto').textContent = crypto.toFixed(2);
+            document.getElementById('price').textContent = price.toFixed(2);
+            document.getElementById('power').textContent = miningPower;
+        }
+
+        function showMessage(msg, color = "#fff") {
+            const m = document.getElementById('message');
+            m.textContent = msg;
+            m.style.color = color;
+            setTimeout(() => m.textContent = '', 2000);
+        }
+
+        document.getElementById('mineBtn').onclick = function() {
+            crypto += miningPower;
+            showMessage(`You mined ${miningPower} coin(s)!`, "#2ecc71");
+            updateUI();
+        };
+
+        document.getElementById('upgradeBtn').onclick = function() {
+            if (cash >= upgradeCost) {
+                cash -= upgradeCost;
+                miningPower++;
+                upgradeCost = Math.floor(upgradeCost * 1.5);
+                this.textContent = `Upgrade Miner ($${upgradeCost})`;
+                showMessage("Miner upgraded!", "#2ecc71");
+                updateUI();
+            } else {
+                showMessage("Not enough cash!", "#e74c3c");
+            }
+        };
+
+        document.getElementById('buyBtn').onclick = function() {
+            let amt = parseInt(document.getElementById('buyAmount').value);
+            if (amt > 0 && cash >= amt * price) {
+                cash -= amt * price;
+                crypto += amt;
+                showMessage(`Bought ${amt} coin(s)!`, "#2ecc71");
+                updateUI();
+            } else {
+                showMessage("Not enough cash!", "#e74c3c");
+            }
+        };
+
+        document.getElementById('sellBtn').onclick = function() {
+            let amt = parseInt(document.getElementById('sellAmount').value);
+            if (amt > 0 && crypto >= amt) {
+                cash += amt * price;
+                crypto -= amt;
+                showMessage(`Sold ${amt} coin(s)!`, "#2ecc71");
+                updateUI();
+            } else {
+                showMessage("Not enough crypto!", "#e74c3c");
+            }
+        };
+
+        // Passive mining
+        setInterval(() => {
+            crypto += miningPower * 0.2;
+            updateUI();
+        }, 1000);
+
+        // Price fluctuation
+        setInterval(() => {
+            let change = (Math.random() - 0.5) * 10;
+            price = Math.max(10, price + change);
+            updateUI();
+        }, 2000);
+
+        updateUI();
+    </script>
+</body>
+</html>
